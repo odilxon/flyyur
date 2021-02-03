@@ -60,10 +60,15 @@ def Show_Venue(data):
       ve = {"city": place[0], "state": place[1], "venues": []}
       for v in data:
         if (v.city,v.state) == place:
+          shows = Show.query.filter_by(venue_id=v.id).all()
+          num_up_shows = 0
+          for show in shows:
+            if show.start_time > datetime.now():
+              num_up_shows+=1
           d = {
             "id" : v.id,
             "name" : v.name,
-            "num_upcoming_shows" : "-"
+            "num_upcoming_shows" : num_up_shows
           }
           ve["venues"].append(d)
       res.append(ve)
@@ -76,10 +81,15 @@ def Search_Venue(data, seach_term):
     string = seach_term.lower()
     for v in data:
         if string in v.name.lower().split():
+          shows = Show.query.filter_by(venue_id=v.id).all()
+          num_up_shows = 0
+          for show in shows:
+            if show.start_time > datetime.now():
+              num_up_shows+=1
           ven = {
             "id" : v.id,
             "name" : v.name,
-            "num_upcoming_shows" : "-"
+            "num_upcoming_shows" : num_up_shows
           }
           response["data"].append(ven)
           response["count"]+=1
@@ -121,10 +131,15 @@ def Search_Artist(data, seach_term):
   string = seach_term.lower()
   for a in data:
     if string in a.name.lower().split():
+      shows = Show.query.filter_by(artist_id=a.id).all()
+      num_up_shows = 0
+      for show in shows:
+        if show.start_time > datetime.now():
+          num_up_shows+=1
       ar = {
         "id" : a.id,
         "name" : a.name,
-        "num_upcoming_shows" : "-"
+        "num_upcoming_shows" : num_up_shows
       }
       response["data"].append(ar)
       response["count"] += 1
@@ -252,6 +267,7 @@ def venues():
   #     "num_upcoming_shows": 0,
   #   }]
   # }]
+  
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
@@ -505,20 +521,24 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
-  # TODO: populate form with fields from artist with ID <artist_id>
+  artist = Artist.query.get(artist_id)
+  # artist={
+  #   "id": 4,
+  #   "name": "Guns N Petals",
+  #   "genres": ["Rock n Roll"],
+  #   "city": "San Francisco",
+  #   "state": "CA",
+  #   "phone": "326-123-5000",
+  #   "website": "https://www.gunsnpetalsband.com",
+  #   "facebook_link": "https://www.facebook.com/GunsNPetals",
+  #   "seeking_venue": True,
+  #   "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
+  #   "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
+  # }
+  # # TODO: populate form with fields from artist with ID <artist_id>
+  form.state.default = artist.state
+  form.seeking_venue.default = "1" if artist.seeking_venue is True else "0"
+  form.process()
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
