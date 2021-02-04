@@ -78,8 +78,10 @@
 	<h2 class="monospace"> Manage Venue </h2>
 	<div class="row">
 		<div class="col-sm-4">
+			<a  href="/venues/{{venue.id}}/edit" type="button" id="edit_venue" class="btn btn-primary"> EDIT </a>
 			<button type="button" id="delete_venue" class="btn btn-danger" data-id="{{venue.id}}"> DELETE </button>
 		</div>
+		
 	</div>
 </section>
 {% endblock %}

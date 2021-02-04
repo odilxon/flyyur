@@ -1,7 +1,9 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, RadioField
-from wtforms.validators import Required, DataRequired, InputRequired, AnyOf, URL
+from flask_wtf.html5 import URLField
+from wtforms import ValidationError,StringField, SelectField, SelectMultipleField, DateTimeField, RadioField
+from wtforms.validators import Required, DataRequired, InputRequired, AnyOf, url
+
 
 
 states = [
@@ -78,12 +80,13 @@ genres = [
             ('Soul', 'Soul'),
             ('Other', 'Other'),
         ]
+
 class ShowForm(FlaskForm):
     artist_id = StringField(
-        'artist_id'
+        'artist_id', validators=[DataRequired()]
     )
     venue_id = StringField(
-        'venue_id'
+        'venue_id', validators=[DataRequired()]
     )
     start_time = DateTimeField(
         'start_time',
@@ -108,25 +111,25 @@ class VenueForm(FlaskForm):
     phone = StringField(
         'phone', validators=[DataRequired()]
     )
-    image_link = StringField(
-        'image_link', validators=[DataRequired()]
+    image_link = URLField(
+        'image_link', validators=[DataRequired(),url()]
     )
-    website  = StringField(
-        'website', validators=[DataRequired()]
+    website  = URLField(
+        'website', validators=[DataRequired(),url()]
     ) 
-    seeking_talent= RadioField('seeking_talant',coerce=int,choices=[('1','True'),('0','False')])
+    seeking_talent= RadioField('seeking_talant',coerce=int,choices=[('1','True'),('0','False')], validators=[DataRequired()])
     seeking_description = StringField(
-        "seeking_description"
+        "seeking_description",
     )
     genres = SelectMultipleField(
         # TODO implement enum restriction
         'genres', validators=[DataRequired()],
         choices=genres
     )
-    facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+    facebook_link = URLField(
+        'facebook_link', validators=[DataRequired(),url()]
     )
-
+    
 class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
@@ -140,24 +143,24 @@ class ArtistForm(FlaskForm):
     )
     phone = StringField(
         # TODO implement validation logic for state
-        'phone'
+        'phone', validators=[DataRequired()]
     )
-    image_link = StringField(
-        'image_link'
+    image_link = URLField(
+        'image_link', validators=[DataRequired()]
     )
     genres = SelectMultipleField(
         # TODO implement enum restriction
         'genres', validators=[DataRequired()],
         choices=genres
     )
-    facebook_link = StringField(
+    facebook_link = URLField(
         # TODO implement enum restriction
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[DataRequired(),url()]
     )
-    website = StringField(
-        "website"
+    website = URLField(
+        "website", validators=[DataRequired()]
     )
-    seeking_venue= RadioField('seeking_venue',coerce=int,choices=[('1','True'),('0','False')])
+    seeking_venue= RadioField('seeking_venue',validators=[DataRequired()],coerce=int,choices=[('1','True'),('0','False')])
     seeking_description = StringField(
         "seeking_description"
     )
