@@ -15,7 +15,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean())
     seeking_description = db.Column(db.String(500))
-
+    shows = db.relationship("Show", backref="Venue", lazy=True)
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -30,7 +30,7 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean())
     seeking_description = db.Column(db.String(500))
-    show = db.relationship("Show", back_populates="Show", lazy="dynamic")
+    shows = db.relationship("Show", backref="Artist", lazy=True)
 
 class Show(db.Model):
   __tablename__ = "Show"
@@ -125,9 +125,8 @@ def Search_Artist(data, seach_term):
 
 
 def Show_shows(shows):
-  print(shows[0].__dict__)
-  print(shows[0].artist_name)
   data = []
+  
   for show in shows:
     
     ven = Venue.query.get(show.venue_id)
@@ -145,12 +144,17 @@ def Show_shows(shows):
   return data
 def Shows_for_Venue(data):
   now = datetime.now()
-  shows = Show.query.filter_by(venue_id=data["id"]).all()
+  venue = db.session.query(Venue).filter(Venue.id == data["id"]).one()
+  shows = db.session.query(Show)
+  join_venue = shows.join(Venue)
+  show_for_venue = join_venue.filter(Show.venue_id == data["id"])
+  
   data["upcoming_shows"] = []
   data["upcoming_shows_count"] = 0
   data["past_shows"] = []
   data["past_shows_count"] = 0
-  for show in shows:
+  
+  for show in show_for_venue:
     art = Artist.query.get(show.artist_id)
     sh = {
       "artist_id" : show.venue_id,
@@ -165,14 +169,21 @@ def Shows_for_Venue(data):
       data["past_shows"].append(sh)
       data["past_shows_count"] += 1
   return data
+
 def Shows_for_Artist(data):
   now = datetime.now()
-  shows = Show.query.filter_by(artist_id=data["id"]).all()
   data["upcoming_shows"] = []
   data["upcoming_shows_count"] = 0
   data["past_shows"] = []
   data["past_shows_count"] = 0
-  for show in shows:
+  
+  artist = db.session.query(Artist).filter(Artist.id == data["id"]).one()
+  shows = db.session.query(Show)
+  join_artist = shows.join(Artist)
+  show_for_artist = join_artist.filter(Show.artist_id == data["id"])
+  
+  
+  for show in show_for_artist:
     ven = Venue.query.get(show.venue_id)
     sh = {
       "venue_id" : show.venue_id,

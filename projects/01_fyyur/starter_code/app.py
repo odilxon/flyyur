@@ -116,7 +116,6 @@ def show_venue(venue_id):
   data = Venue.query.get(venue_id).__dict__
   data["genres"] = data["genres"].split(",")
   data = Shows_for_Venue(data)
-  
   data3={
     "id": 3,
     "name": "Park Square Live Music & Coffee",
@@ -489,7 +488,7 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data = Show_shows(Show.query.join(Artist.name).all())
+  data = Show_shows(Show.query.all())
   # data=[{
   #   "venue_id": 1,
   #   "venue_name": "The Musical Hop",
