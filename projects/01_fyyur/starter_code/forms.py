@@ -2,7 +2,7 @@ from datetime import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.html5 import URLField
 from wtforms import ValidationError,StringField, SelectField, SelectMultipleField, DateTimeField, RadioField
-from wtforms.validators import Required, DataRequired, InputRequired, AnyOf, url
+from wtforms.validators import Required, DataRequired, InputRequired, AnyOf, url, Regexp
 
 
 
@@ -109,7 +109,7 @@ class VenueForm(FlaskForm):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone', validators=[DataRequired()]
+        'phone', validators=[DataRequired(),Regexp(r"\+\d+") ]
     )
     image_link = URLField(
         'image_link', validators=[DataRequired(),url()]
@@ -143,7 +143,7 @@ class ArtistForm(FlaskForm):
     )
     phone = StringField(
         # TODO implement validation logic for state
-        'phone', validators=[DataRequired()]
+        'phone', validators=[DataRequired(),Regexp(r"\d+")]
     )
     image_link = URLField(
         'image_link', validators=[DataRequired()]

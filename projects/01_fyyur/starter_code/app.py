@@ -166,35 +166,36 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-  #print(request)
-  name = request.form["name"]
-  city = request.form["city"]
-  state = request.form["state"]
-  address = request.form["address"]
-  phone = request.form["phone"]
-  image_link = request.form["image_link"]
-  facebook_link = request.form["facebook_link"]
-  website = request.form["website"]
-  seeking_talent = False if request.form["seeking_talent"]=="0" else True
-  seeking_description = request.form["seeking_description"]
+  form = VenueForm(request.form)
+  if form.validate_on_submit():
+    name = request.form["name"]
+    city = request.form["city"]
+    state = request.form["state"]
+    address = request.form["address"]
+    phone = request.form["phone"]
+    image_link = request.form["image_link"]
+    facebook_link = request.form["facebook_link"]
+    website = request.form["website"]
+    seeking_talent = False if request.form["seeking_talent"]=="0" else True
+    seeking_description = request.form["seeking_description"]
 
-  genres = ",".join(request.form.getlist("genres"))
-  try:
+    genres = ",".join(request.form.getlist("genres"))
+    try:
 
-    venue = Venue(name=name, city=city, state=state, address=address, phone=phone,image_link=image_link,facebook_link=facebook_link, website=website, seeking_talent=seeking_talent, seeking_description=seeking_description,genres=genres)
-    db.session.add(venue)
-    db.session.commit()
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+      venue = Venue(name=name, city=city, state=state, address=address, phone=phone,image_link=image_link,facebook_link=facebook_link, website=website, seeking_talent=seeking_talent, seeking_description=seeking_description,genres=genres)
+      db.session.add(venue)
+      db.session.commit()
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
 
-  except Exception as e:
-    print(str(e))
-    flash('Venue ' + request.form['name'] + ' was not successfully listed(') 
-  finally:
-    db.session.close()
-  print(request.form)
-  # on successful db insert, flash success
+    except Exception as e:
+      print(str(e))
+      flash('Venue ' + request.form['name'] + ' was not successfully listed(') 
+    finally:
+      db.session.close()
+    print(request.form)
+  else:
+    flash('Venue ' + request.form['name'] + ' was not successfully listed(')
+    # on successful db insert, flash success
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
